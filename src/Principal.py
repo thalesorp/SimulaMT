@@ -1,5 +1,5 @@
 #!/usr/bin/env python 
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 
 import sys
 from Simulador import *
@@ -55,11 +55,20 @@ def main():
 
     simulaMT = Simulador(opcao, n_steps, delimiter, arquivo)
 
+    print ""
+    print "Simulador de Máquina de Turing ver 1.0"
+    print "Desenvolvido como trabalho prático para a disciplina de Teoria da Computação"
+    print "Thales Otávio e Pedro Costa, IFMG - Formiga , 2019.\n"
+    sys.stdout.write("Forneça a palavra inicial: ")
+    palavra = raw_input()
+    
+    simulaMT.computa(palavra)
+
 # Erro: "python Principal.py -head {"
 #       "python Principal.py -head { arq.mt"
 
 # 0        1         2                 3          4            5
-#----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------
 # simulaMT <opções>  <arquivo>                                              | opções = -r ou -v
 # simulaMT -s        <n>               <arquivo>
 # simulaMT -head     <delimitadores>   <opções>   <arquivo>                 | opções = -r ou -v
