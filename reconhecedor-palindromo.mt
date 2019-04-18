@@ -1,10 +1,10 @@
-; Detector de palíndromos
+   ; Detector de palindromos
 
 bloco main 1
     01 a -- A i 10
     01 b -- B i 20
     10 moveFim 11
-    20 moveFim 21
+    20 moveFim 2
 
     ; leu a
     11 iniEsq 12
