@@ -4,18 +4,6 @@
 import sys
 
 class Simulador(object):
-    # Atributos
-    opcao = None
-    n_steps = None
-    delimiter = None
-    arquivo = None
-
-    blocos = None
-
-    fita = None
-    fita2 = None
-
-    cabecote_fita = None
 
     # Construtor
     def __init__(self, opcao, n_steps, delimiter, arquivo):
@@ -30,15 +18,92 @@ class Simulador(object):
         self.fita_segunda = list()
 
         self.cabecote_fita = 0
-        
+
+        self.pilha_blocos = list()
+
         self.__armazena_codigo_fonte__()
-        self.debug()
-        '''print "opcao =", opcao
-        print "n_steps =", n_steps
-        print "delimiter =", delimiter
-        print "arquivo =", arquivo'''
 
     # Métodos
+    def computa(self, palavra):
+        self.__guarda_na_fita__(palavra)
+
+        self.debug_mostra_fita()
+
+        nome_bloco = "main"
+
+        estado_atual = self.get_estado_inicial_bloco(nome_bloco)
+
+        while True:
+            letra_cabecote = self.get_letra_atual_cabecote()
+
+            operacao = self.get_operacao(nome_bloco, estado_atual, letra_cabecote)
+            if operacao == "erro":
+                print "Deu ruim!"
+                exit()
+
+            if operacao[0] == "op":
+                self.set_letra_cabecote_fita(operacao[3])
+                self.move_cabecote(operacao[4])
+                estado_atual = operacao[5]
+
+                if estado_atual == "retorne": # Desempilha da pilha de blocos.
+                    [nome_bloco, estado_atual] = self.pilha_blocos.pop()
+
+            if operacao[0] == "func":
+                self.pilha_blocos.append([nome_bloco, operacao[3]])
+                nome_bloco = operacao[2]
+                estado_atual = self.get_estado_inicial_bloco(nome_bloco)
+
+            self.debug_mostra_fita()
+
+    def set_letra_cabecote_fita(self, letra):
+        if letra != "*":
+            self.fita[self.cabecote_fita] = letra
+
+    def move_cabecote(self, direcao):
+        deslocamento = 0
+
+        if direcao == "d":
+            deslocamento = 1
+        elif direcao == "e":
+            deslocamento = -1
+
+        if (self.cabecote_fita == len(self.fita)-1) and (deslocamento == 1):
+            self.fita.append("_")
+            self.cabecote_fita = self.cabecote_fita + deslocamento
+            return
+
+        if (self.cabecote_fita == 0) and (deslocamento == -1):
+            self.fita.insert(0,"_")
+            self.cabecote_fita = 0
+            return
+
+        self.cabecote_fita = self.cabecote_fita + deslocamento
+
+    # Getters.
+    def get_estado_inicial_bloco(self, nome_bloco):
+        for bloco in self.blocos:
+            if bloco[0] == nome_bloco:
+                return bloco[1]
+        return "erro estado inicial bloco"
+
+    def get_letra_atual_cabecote(self):
+        #
+        return self.fita[self.cabecote_fita]
+
+    def get_operacao(self, nome_bloco, estado_atual, letra_cabecote):
+        for bloco in self.blocos:
+            if bloco[0] == nome_bloco:
+                for operacao in bloco[2]:
+                    if operacao[1] == estado_atual:
+                        if operacao[0] == "op":
+                            if (operacao[2] == letra_cabecote) or (operacao[2] == "*"):
+                                return operacao
+                        elif operacao[0] == "func":
+                            return operacao
+        return "erro"
+
+    # Métodos privados.
     def __armazena_codigo_fonte__(self):
         dentro_bloco = False
 
@@ -54,15 +119,13 @@ class Simulador(object):
             if linha:
                 # Ignorando comentários.
                 if linha[0] != ";":
-                    sys.stdout.write("LINHA: \"" + linha + "\"\n")
-
                     linha = linha.split(" ")
                     if (dentro_bloco == False) and (linha[0] == "bloco"):
                         # Começa aqui a ler um bloco.
                         dentro_bloco = True
                         nome_bloco = linha[1]
                         estado_inicial = linha[2]
-                        
+
                         bloco_atual = list()
                         bloco_atual.append(nome_bloco)
                         bloco_atual.append(estado_inicial)
@@ -76,25 +139,24 @@ class Simulador(object):
                         self.blocos.append(bloco_atual)
                     
                     if dentro_bloco == True:
-                        operacoes_atuais.append(linha) #['01', 'a', '--', 'A', 'i', '10']
+                        # Verificando se é operação ou chamada de função, e inserido seus identificadores.
+                        if linha[2] == "--":
+                            del(linha[2])
+                            linha.insert(0,"op") #['op', '01', 'a', '--', 'A', 'i', '10']
+                        else:
+                            linha.insert(0,"func") #['func','01', 'nome_funcao', '10']
 
+                        operacoes_atuais.append(linha)
         arq.close()
-
-
-    def computa(self, palavra):
-        self.__guarda_na_fita__(palavra)
-
 
     def __guarda_na_fita__(self, palavra):
         for letra in palavra:
             self.fita.append(letra)
 
-        print self.fita
-
-
+    # Outros.
     def debug(self):
 
-        '''print self.blocos           # Todos os blocos.
+        '''print self.blocos        # Todos os blocos.
         print "\n"
         print self.blocos[0]        # Primeiro bloco.
         print "\n"
@@ -120,11 +182,7 @@ class Simulador(object):
                 print operacao
             i = i + 1
 
-
-
-# 0        1         2                 3          4            5
-#----------------------------------------------------------------------------------------------------
-# simulaMT <opções>  <arquivo>                                              | opções = -r ou -v
-# simulaMT -s        <n>               <arquivo>
-# simulaMT -head     <delimitadores>   <opções>   <arquivo>                 | opções = -r ou -v
-# simulaMT -head     <delimitadores>   -s         <n>         <arquivo>
+    def debug_mostra_fita(self):
+        fita = list(self.fita)
+        fita[self.cabecote_fita] = "["+fita[self.cabecote_fita]+"]"
+        print "Fita:", fita

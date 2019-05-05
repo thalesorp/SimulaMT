@@ -1,10 +1,11 @@
    ; Detector de palindromos
 
-bloco main 1
+
+bloco main 01
     01 a -- A i 10
     01 b -- B i 20
     10 moveFim 11
-    20 moveFim 2
+    20 moveFim 21
 
     ; leu a
     11 iniEsq 12
@@ -28,19 +29,19 @@ bloco main 1
 fim ; main
 
 ; move para ultimo caractere da palavra
-bloco moveFim 1
+bloco moveFim 01
     01 _ -- * e retorne
     01 * -- * d 01
 fim ; moveFim
 
 ; move para primeiro caractere da palavra
-bloco moveIni 1
+bloco moveIni 01
     01 _ -- * d retorne
     01 * -- * e 01
 fim ; moveIni
 
 ; recua ate caractere minusculo ou _
-bloco iniEsq 1
+bloco iniEsq 01
     01 _ -- * i retorne
     01 a -- * i retorne
     01 b -- * i retorne
@@ -48,7 +49,7 @@ bloco iniEsq 1
 fim ; iniEsq
 
 ; avanca ate caractere minusculo ou _
-bloco iniDir 1
+bloco iniDir 01
     01 _ -- * i retorne
     01 a -- * i retorne
     01 b -- * i retorne
@@ -56,19 +57,21 @@ bloco iniDir 1
 fim ; iniDir
 
 ; palavra eh palindromo
-bloco sim 1
+bloco sim 01
     01 moveFim 02
     02 * -- * d 03
-    03 * -- S d 04
-    03 * -- I d 04
-    03 * -- M d retorne
+    03 * -- _ d 04
+    04 * -- S d 05
+    05 * -- I d 06
+    06 * -- M d retorne
 fim ; sim
 
 ; palavra nao eh palindromo
-bloco nao 1
+bloco nao 01
     01 moveFim 02
     02 * -- * d 03
-    03 * -- N d 04
-    03 * -- A d 04
-    03 * -- O d retorne
+    03 * -- _ d 04
+    04 * -- N d 05
+    05 * -- A d 06
+    06 * -- O d retorne
 fim ; nao

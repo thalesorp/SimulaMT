@@ -25,7 +25,7 @@ def main():
     elif (len(sys.argv) == 4) and (sys.argv[1] == "-s"):
         opcao = sys.argv[1]
         arquivo = sys.argv[3]
-        
+
         if not sys.argv[2].isdigit():
             print "Número de steps inválido!"
             quit()
@@ -61,8 +61,9 @@ def main():
     print "Thales Otávio e Pedro Costa, IFMG - Formiga , 2019.\n"
     sys.stdout.write("Forneça a palavra inicial: ")
     palavra = raw_input()
-    
+
     simulaMT.computa(palavra)
+
 
 # Erro: "python Principal.py -head {"
 #       "python Principal.py -head { arq.mt"
@@ -77,3 +78,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#Python argparser
