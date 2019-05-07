@@ -1,12 +1,12 @@
-#!/usr/bin/env python 
-# encoding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import sys
 
 class Simulador(object):
 
     # Construtor
-    def __init__(self, opcao, n_steps, delimiter, arquivo):
+    def __init__(self, arquivo, opcao, n_steps, delimiter):
         self.opcao = opcao
         self.n_steps = n_steps
         self.delimiter = delimiter

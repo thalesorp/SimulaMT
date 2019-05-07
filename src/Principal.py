@@ -1,17 +1,42 @@
-#!/usr/bin/env python 
-# encoding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import sys
+import argparse
+
 from Simulador import *
 
 def main():
-
     simulaMT = None
+    arquivo = None
     opcao = None
     n_steps = 500
     delimiter = "()"
-    arquivo = None
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file_path', metavar='file', type=str, help='arquivo do algoritmo a ser simulado')
+    parser.add_argument("-r", "--resume", action='store_true', help="executa o programa até o fim em modo silencioso")
+    parser.add_argument("-v", "--verbose", action='store_true', help="executa até o fim mostrando o resultado passo a passo da execução")
+    parser.add_argument("-s", "--steps", metavar='N', help="mostra o resultado passo a passo de N computações, depois reabre o prompt para aguardar nova opção (-r,-v,-s). Caso não seja fornecida nova opção (entrada em branco), o padrão é repetir a mesma opção fornecida anteriormente")
+    parser.add_argument("-head", metavar='DELIMITADORES', help="modifica os dois caracteres delimitadores, esquerdo e direito, do cabeçote")
+    args = vars(parser.parse_args())
+
+    arquivo = args['file_path']
+    print "arquivo:", arquivo
+    
+    opcao = "?"
+    
+    n_steps = args['steps']
+    print "n_steps:", n_steps
+
+    if not args['head']:
+        print "not args"
+        delimiter = args['head']
+
+    print "delimiter:", delimiter
+    raw_input()
+
+    '''
     if len(sys.argv) < 3:
         print 'Parametros incorretos!'
         quit()
@@ -52,13 +77,14 @@ def main():
             arquivo = sys.argv[5]
         else:
             arquivo = sys.argv[4]
+    '''
 
-    simulaMT = Simulador(opcao, n_steps, delimiter, arquivo)
+    simulaMT = Simulador(arquivo, opcao, n_steps, delimiter)
 
     print ""
-    print "Simulador de Máquina de Turing ver 1.0"
-    print "Desenvolvido como trabalho prático para a disciplina de Teoria da Computação"
-    print "Thales Otávio e Pedro Costa, IFMG - Formiga , 2019.\n"
+    print "Simulador de Máquina de Turing v2.0"
+    print "Desenvolvido como trabalho prático para a disciplina de Teoria da Computação."
+    print "Thales Otávio e Pedro Costa, IFMG - Campus Formiga, 2019.\n"
     sys.stdout.write("Forneça a palavra inicial: ")
     palavra = raw_input()
 
@@ -74,7 +100,6 @@ def main():
 # simulaMT -s        <n>               <arquivo>
 # simulaMT -head     <delimitadores>   <opções>   <arquivo>                 | opções = -r ou -v
 # simulaMT -head     <delimitadores>   -s         <n>         <arquivo>
-
 
 if __name__ == "__main__":
     main()
