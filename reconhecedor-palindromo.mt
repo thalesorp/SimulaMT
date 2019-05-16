@@ -24,8 +24,8 @@ bloco main 01
     32 _ -- * e 60
     32 * -- * i 01
 
-    60 sim pare
-    70 nao pare
+    60 sim pare_aceita
+    70 nao pare_rejeita
 fim ; main
 
 ; move para ultimo caractere da palavra

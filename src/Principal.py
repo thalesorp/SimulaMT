@@ -13,6 +13,7 @@ def main():
     n_steps = 500
     delimiter = "()"
 
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('file_path', metavar='file', type=str, help='arquivo do algoritmo a ser simulado')
     parser.add_argument("-r", "--resume", action='store_true', help="executa o programa até o fim em modo silencioso")
@@ -25,6 +26,7 @@ def main():
     print "arquivo:", arquivo
     
     opcao = "?"
+    opcao = args['']
     
     n_steps = args['steps']
     print "n_steps:", n_steps
@@ -35,28 +37,22 @@ def main():
 
     print "delimiter:", delimiter
     raw_input()
-
     '''
+
+
     if len(sys.argv) < 3:
         print 'Parametros incorretos!'
         quit()
-
-
     elif (len(sys.argv) == 3) and (sys.argv[1] == "-r" or sys.argv[1] == "-v"):
         opcao = sys.argv[1]
         arquivo = sys.argv[2]
-
-
     elif (len(sys.argv) == 4) and (sys.argv[1] == "-s"):
         opcao = sys.argv[1]
         arquivo = sys.argv[3]
-
         if not sys.argv[2].isdigit():
             print "Número de steps inválido!"
             quit()
         n_steps = sys.argv[2]
-
-
     elif (len(sys.argv) >= 5) and (sys.argv[1] == "-head"):
         opcao = sys.argv[3]
         
@@ -64,11 +60,9 @@ def main():
             print "Erro nos delimitadores!"
             quit()
         delimiter = sys.argv[2]
-
         if (opcao != "-r") and (opcao != "-v") and (opcao != "-s"):
             print "Opção invalida!"
             quit()
-
         elif opcao == "-s":
             if not sys.argv[4].isdigit():
                 print "Número de steps inválido!"
@@ -77,17 +71,18 @@ def main():
             arquivo = sys.argv[5]
         else:
             arquivo = sys.argv[4]
-    '''
+
+
 
     simulaMT = Simulador(arquivo, opcao, n_steps, delimiter)
 
     print ""
-    print "Simulador de Máquina de Turing v2.0"
+    print "Simulador de Máquina de Turing v3.0"
     print "Desenvolvido como trabalho prático para a disciplina de Teoria da Computação."
     print "Thales Otávio e Pedro Costa, IFMG - Campus Formiga, 2019.\n"
     sys.stdout.write("Forneça a palavra inicial: ")
     palavra = raw_input()
-
+    
     simulaMT.computa(palavra)
 
 

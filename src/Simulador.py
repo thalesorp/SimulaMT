@@ -15,7 +15,7 @@ class Simulador(object):
         self.blocos = list()
 
         self.fita = list()
-        self.fita_segunda = list()
+        self.fita_segunda = ["_"]
 
         self.cabecote_fita = 0
 
@@ -27,19 +27,28 @@ class Simulador(object):
     def computa(self, palavra):
         self.__guarda_na_fita__(palavra)
 
-        self.debug_mostra_fita()
-
         nome_bloco = "main"
 
         estado_atual = self.get_estado_inicial_bloco(nome_bloco)
 
-        while True:
+        self.debug_mostra_fita(nome_bloco, estado_atual)
+
+        resultado = None
+        while (resultado == None):
             letra_cabecote = self.get_letra_atual_cabecote()
 
+            if estado_atual == "pare_aceita":
+                resultado = True
+                continue
+            if estado_atual == "pare_rejeita":
+                resultado = False
+                continue
+
             operacao = self.get_operacao(nome_bloco, estado_atual, letra_cabecote)
+
             if operacao == "erro":
-                print "Deu ruim!"
-                exit()
+                resultado = False
+                continue
 
             if operacao[0] == "op":
                 self.set_letra_cabecote_fita(operacao[3])
@@ -54,7 +63,7 @@ class Simulador(object):
                 nome_bloco = operacao[2]
                 estado_atual = self.get_estado_inicial_bloco(nome_bloco)
 
-            self.debug_mostra_fita()
+            self.debug_mostra_fita(nome_bloco, estado_atual)
 
     def set_letra_cabecote_fita(self, letra):
         if letra != "*":
@@ -182,7 +191,54 @@ class Simulador(object):
                 print operacao
             i = i + 1
 
-    def debug_mostra_fita(self):
-        fita = list(self.fita)
-        fita[self.cabecote_fita] = "["+fita[self.cabecote_fita]+"]"
-        print "Fita:", fita
+    def debug_mostra_fita(self, nome_bloco, estado_atual):
+        total = 50
+        metadeEsquerda = 25
+        metadeDireita = 25
+
+        caractere = "_"
+
+        tFita = list(self.fita)
+
+        # Remove underlines quando o cabeçote não está nas pontas.
+        if tFita[0] == "_" and self.cabecote_fita != 0:
+                tFita = tFita[1:len(tFita)]
+        if tFita[len(tFita)-1] == "_" and self.cabecote_fita != len(tFita):
+                tFita = tFita[0:(len(tFita)-1)]
+
+        # Adiciono os delimitadores do cabeçote na posição correta.
+        if self.cabecote_fita == 0:
+            tFita.insert(self.cabecote_fita, self.delimiter[0])
+            tFita.insert(self.cabecote_fita + 2, self.delimiter[1])
+        else:
+            tFita.insert(self.cabecote_fita - 1, self.delimiter[0])
+            tFita.insert(self.cabecote_fita + 1, self.delimiter[1])
+
+        tamanho_palavra = len(tFita)
+
+        if (tamanho_palavra % 2) == 0:
+            # Quando é par, remove dos underlines, o tamanho da metade da palavra.
+            metadeEsquerda = metadeEsquerda - tamanho_palavra/2
+            metadeDireita = metadeDireita - tamanho_palavra/2
+        else:
+            metadeEsquerda = metadeEsquerda - tamanho_palavra/2
+            metadeDireita = metadeDireita - ((tamanho_palavra/2)+1)
+        
+        fitaFinal = (metadeEsquerda * "_") + ''.join(tFita) + (metadeDireita * "_")
+
+        total = 25
+
+        tamanho_palavra = len(nome_bloco) + 1 + len(estado_atual)
+
+        qtd_restantes = total - tamanho_palavra
+
+        bolinhas = "." * qtd_restantes
+
+        sys.stdout.write(bolinhas)
+        sys.stdout.write(nome_bloco)
+        sys.stdout.write(".")
+        sys.stdout.write(estado_atual)
+        sys.stdout.write(" : ")
+        sys.stdout.write(fitaFinal)
+        sys.stdout.write(" : ")
+        sys.stdout.write(''.join(self.fita_segunda) + "\n")
