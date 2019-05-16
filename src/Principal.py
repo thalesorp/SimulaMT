@@ -81,9 +81,11 @@ def main():
     print "Desenvolvido como trabalho prático para a disciplina de Teoria da Computação."
     print "Thales Otávio e Pedro Costa, IFMG - Campus Formiga, 2019.\n"
     sys.stdout.write("Forneça a palavra inicial: ")
-    palavra = raw_input()
+    print ""
+    #palavra = raw_input()
     
-    simulaMT.computa(palavra)
+    #simulaMT.computa(palavra)
+    simulaMT.computa("Este exemplo funciona.")
 
 
 # Erro: "python Principal.py -head {"
