@@ -24,10 +24,10 @@ def main():
 
     arquivo = args['file_path']
     print "arquivo:", arquivo
-    
+
     opcao = "?"
     opcao = args['']
-    
+
     n_steps = args['steps']
     print "n_steps:", n_steps
 
@@ -38,7 +38,6 @@ def main():
     print "delimiter:", delimiter
     raw_input()
     '''
-
 
     if len(sys.argv) < 3:
         print 'Parametros incorretos!'
@@ -73,32 +72,16 @@ def main():
             arquivo = sys.argv[4]
 
 
-
     simulaMT = Simulador(arquivo, opcao, n_steps, delimiter)
 
     print ""
-    print "Simulador de Máquina de Turing v3.0"
+    print "Simulador de Máquina de Turing v4.0"
     print "Desenvolvido como trabalho prático para a disciplina de Teoria da Computação."
     print "Thales Otávio e Pedro Costa, IFMG - Campus Formiga, 2019.\n"
     sys.stdout.write("Forneça a palavra inicial: ")
-    print ""
-    #palavra = raw_input()
-    
-    #simulaMT.computa(palavra)
-    simulaMT.computa("Este exemplo funciona.")
+    palavra = raw_input()
 
-
-# Erro: "python Principal.py -head {"
-#       "python Principal.py -head { arq.mt"
-
-# 0        1         2                 3          4            5
-#----------------------------------------------------------------------------
-# simulaMT <opções>  <arquivo>                                              | opções = -r ou -v
-# simulaMT -s        <n>               <arquivo>
-# simulaMT -head     <delimitadores>   <opções>   <arquivo>                 | opções = -r ou -v
-# simulaMT -head     <delimitadores>   -s         <n>         <arquivo>
+    simulaMT.compila(palavra)
 
 if __name__ == "__main__":
     main()
-
-#Python argparser

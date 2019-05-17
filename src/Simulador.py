@@ -6,109 +6,109 @@ import sys
 class Simulador(object):
 
     # Construtor
-    def __init__(self, arquivo, opcao, n_steps, delimiter):
-        self.opcao = opcao
-        self.n_steps = n_steps
-        self.delimiter = delimiter
+    def __init__(self, arquivo, opcao, qtd_passos, delimitadores):
         self.arquivo = arquivo
+        self.opcao = opcao[1] # "-r", "-v", "-s N".
+        self.qtd_passos = int(qtd_passos)
+        self.delimitadores = delimitadores
 
         self.blocos = list()
+        self.pilha_blocos = list()
 
         self.fita = list()
         self.fita_segunda = ["_"]
-
         self.cabecote_fita = 0
 
-        self.pilha_blocos = list()
+        self.nome_bloco_atual = None
+        self.estado_atual = None
 
         self.__armazena_codigo_fonte__()
 
+
     # Métodos
-    def computa(self, palavra):
-        # Guarda na fita, a palavra a ser computada.
-        for letra in palavra:
-            self.fita.append(letra)
+    def compila(self, palavra):
+        self.__guarda_na_fita__(palavra)
 
-        nome_bloco = "main"
+        self.nome_bloco_atual = "main"
+        self.estado_atual = self.get_estado_inicial_bloco(self.nome_bloco_atual)
 
-        estado_atual = self.get_estado_inicial_bloco(nome_bloco)
+        if self.estado_atual == "erro":
+            self.UI_mostra_resultado("erro")
+            return
 
-        self.mostra_computacao(nome_bloco, estado_atual)
+        self.UI_mostra_divisoria()
 
-
-        resultado = None
+        resultado = self.computa()
+    
         while (resultado == None):
+            self.UI_solicita_nova_opcao()
+            resultado = self.computa()
 
-            if estado_atual == "pare_aceita":
-                resultado = True
-                continue
-            if estado_atual == "pare_rejeita":
-                resultado = False
-                continue
+        self.UI_mostra_resultado(resultado)
 
-            operacao = self.get_operacao(nome_bloco, estado_atual)
+    def computa(self):
+        operacao = [None]
+        computacoes_decorridas = 0
+
+        while (computacoes_decorridas < self.qtd_passos):
+
+            if self.opcao != "r":
+                self.UI_mostra_computacao(self.nome_bloco_atual, self.estado_atual)
+
+            # Caso a computação atual tiver um "!" (breakpoint).
+            if operacao[len(operacao)-1] == "!":
+                return None
+
+            computacoes_decorridas = computacoes_decorridas + 1
+
+            if self.estado_atual == "pare_aceita":
+                return True
+            if self.estado_atual == "pare_rejeita":
+                return False
+
+            operacao = self.get_operacao(self.nome_bloco_atual, self.estado_atual)
 
             if operacao == "erro":
-                resultado = False
-                continue
+                return "erro"
 
             if operacao[0] == "op": # ['op', estado, caractere_atual, caractere_a_escrever, movimento, estado_destino ]
                 self.set_letra_cabecote_fita(operacao[3])
-                self.move_cabecote(operacao[4])
-                estado_atual = operacao[5] # Atualiza o estado atual depois de computar.
+                self.__move_cabecote__(operacao[4])
+                self.__atualiza_estado_atual__(operacao[5])
 
             elif operacao[0] == "func": # ['func', estado_atual, nome_funcao, estado_destino]
-                self.pilha_blocos.append([nome_bloco, operacao[3]])
-                nome_bloco = operacao[2]
-                estado_atual = self.get_estado_inicial_bloco(nome_bloco)
+                self.pilha_blocos.append([self.nome_bloco_atual, operacao[3]])
+                self.__atualiza_bloco_atual__(operacao[2])
+                self.__atualiza_estado_atual__(self.get_estado_inicial_bloco(self.nome_bloco_atual))
+                if self.estado_atual == "erro":
+                    return "erro"
 
             elif operacao[0] == "copi": # ['copi', estado_atual, copiar, estado_destino]
                 self.set_letra_cabecote_fita_segunda(self.get_letra_atual_cabecote())
-                estado_atual = operacao[3] # Atualiza o estado atual depois de computar.
+                self.__atualiza_estado_atual__(operacao[3])
 
             elif operacao[0] == "cola": # ['cola', estado_atual, colar, estado_destino]
                 self.set_letra_cabecote_fita(self.get_letra_fita_segunda())
-                estado_atual = operacao[3] # Atualiza o estado atual depois de computar.
+                self.__atualiza_estado_atual__(operacao[3])
 
-            if estado_atual == "retorne": # Desempilha da pilha de blocos.
-                [nome_bloco, estado_atual] = self.pilha_blocos.pop()
+            if self.estado_atual == "retorne": # Desempilha da pilha de blocos.
+                [self.nome_bloco_atual, self.estado_atual] = self.pilha_blocos.pop()
 
-            self.mostra_computacao(nome_bloco, estado_atual)
+        return None
 
-
-    def move_cabecote(self, direcao):
-        deslocamento = 0
-
-        if direcao == "d":
-            deslocamento = 1
-        elif direcao == "e":
-            deslocamento = -1
-
-        if (self.cabecote_fita == len(self.fita)-1) and (deslocamento == 1):
-            self.fita.append("_")
-            self.cabecote_fita = self.cabecote_fita + deslocamento
-            return
-
-        if (self.cabecote_fita == 0) and (deslocamento == -1):
-            self.fita.insert(0,"_")
-            self.cabecote_fita = 0
-            return
-
-        self.cabecote_fita = self.cabecote_fita + deslocamento
 
     # Getters e setters.
     def get_estado_inicial_bloco(self, nome_bloco):
         for bloco in self.blocos:
             if bloco[0] == nome_bloco:
                 return bloco[1]
-        return "erro estado inicial bloco"
+        return "erro"
 
-    def get_operacao(self, nome_bloco, estado_atual):
-        #print "Entrou em get_operação, com nome_bloco=", nome_bloco, "e estado_atual=", estado_atual
+    def get_operacao(self, nome_bloco, estado):
         for bloco in self.blocos:
             if bloco[0] == nome_bloco:
                 for operacao in bloco[2]:
-                    if operacao[1] == estado_atual:
+                    if operacao[1] == estado:
                         
                         # ['op', estado, caractere_atual, caractere_a_escrever, movimento, estado_destino ]
                         if operacao[0] == "op":
@@ -117,17 +117,16 @@ class Simulador(object):
                             if len(operacao[2]) == 1:
                                 if (operacao[2] == self.get_letra_atual_cabecote()) or (operacao[2] == "*"):
                                     return operacao
-                            
+
                             # Verifica se é uma operação da segunda fita.
                             elif len(operacao[2]) == 3:
                                 # Removendo "[]" do caractere atual.
                                 caractere_atual = operacao[2][1]
                                 if (caractere_atual == self.get_letra_fita_segunda()) or (caractere_atual == "*"):
                                     return operacao
-                        
+
                         elif (operacao[0] == "func") or (operacao[0] == "copi") or (operacao[0] == "cola"):
                             return operacao
-
         return "erro"
 
     def get_letra_atual_cabecote(self):
@@ -146,8 +145,9 @@ class Simulador(object):
         if letra != "*":
             self.fita_segunda[0] = letra
 
-    # UI.
-    def mostra_computacao(self, nome_bloco, estado_atual):
+
+    # Interface com o usuário.
+    def UI_mostra_computacao(self, nome_bloco, estado):
         caractere = "_"
         metadeEsquerda = 25
         metadeDireita = 25
@@ -161,11 +161,11 @@ class Simulador(object):
 
         # Adiciono os delimitadores do cabeçote na posição correta.
         if self.cabecote_fita == 0:
-            tFita.insert(self.cabecote_fita, self.delimiter[0])
-            tFita.insert(self.cabecote_fita + 2, self.delimiter[1])
+            tFita.insert(self.cabecote_fita, self.delimitadores[0])
+            tFita.insert(self.cabecote_fita + 2, self.delimitadores[1])
         else:
-            tFita.insert(self.cabecote_fita - 1, self.delimiter[0])
-            tFita.insert(self.cabecote_fita + 1, self.delimiter[1])
+            tFita.insert(self.cabecote_fita - 1, self.delimitadores[0])
+            tFita.insert(self.cabecote_fita + 1, self.delimitadores[1])
 
         tamanho_palavra = len(tFita)
 
@@ -179,7 +179,7 @@ class Simulador(object):
 
         fitaFinal = (metadeEsquerda * "_") + ''.join(tFita) + (metadeDireita * "_")
 
-        tamanho_palavra = len(nome_bloco) + 1 + len(estado_atual)
+        tamanho_palavra = len(nome_bloco) + 1 + len(estado)
 
         total = 25
 
@@ -192,11 +192,41 @@ class Simulador(object):
         sys.stdout.write(bolinhas)
         sys.stdout.write(nome_bloco)
         sys.stdout.write(".")
-        sys.stdout.write(estado_atual)
+        sys.stdout.write(estado)
         sys.stdout.write(" : ")
         sys.stdout.write(fitaFinal)
         sys.stdout.write(" : ")
         sys.stdout.write(''.join(self.fita_segunda) + "\n")
+
+    def UI_solicita_nova_opcao(self):
+        self.UI_mostra_divisoria()
+        sys.stdout.write("Forneça nova opção (−r, −v, −s): ")
+        nova_opcao = raw_input()
+        
+        if len(nova_opcao) == 0:
+            return
+
+        if len(nova_opcao) > 2: # "-s N"
+            nova_opcao = nova_opcao.split(" ")
+            self.opcao = nova_opcao[0][1]
+            self.qtd_passos = int(nova_opcao[1])
+        
+        else: # "-r" ou "-v"
+            self.opcao = nova_opcao[1]
+
+    def UI_mostra_divisoria(self):
+        #
+        print "__________________________________________________________________________________"
+
+    def UI_mostra_resultado(self, resultado):
+        self.UI_mostra_divisoria()
+        if resultado == True:
+            print "ACEITOU."
+        elif resultado == False:
+            print "REJEITOU."
+        else:
+            print "ERRO."
+
 
     # Métodos privados.
     def __armazena_codigo_fonte__(self):
@@ -248,31 +278,35 @@ class Simulador(object):
                         operacoes_atuais.append(linha)
         arq.close()
 
-    # Outros.
-    def debug(self):
+    def __guarda_na_fita__(self, palavra):
+        # Guarda na fita a palavra a ser computada.
+        for letra in palavra:
+            self.fita.append(letra)
 
-        '''print self.blocos        # Todos os blocos.
-        print "\n"
-        print self.blocos[0]        # Primeiro bloco.
-        print "\n"
-        print self.blocos[0][2]     # Lista de operações do primeiro bloco. 
-        print "\n"
-        print self.blocos[0][2][0]  # Primeira operação do primeiro bloco.
-        print "\n"'''
+    def __move_cabecote__(self, direcao):
+        deslocamento = 0
 
-        i = 1
-        for bloco in self.blocos:
-            print "Bloco ",i
-            print "Nome:", bloco[0]
-            print "Estado inicial:", bloco[1]
-            i = i + 1
-            print ""
+        if direcao == "d":
+            deslocamento = 1
+        elif direcao == "e":
+            deslocamento = -1
 
-        print ""
+        if (self.cabecote_fita == len(self.fita)-1) and (deslocamento == 1):
+            self.fita.append("_")
+            self.cabecote_fita = self.cabecote_fita + deslocamento
+            return
 
-        i = 1
-        for bloco in self.blocos:
-            print "\nOperações do bloco ",i,":"
-            for operacao in bloco[2]:
-                print operacao
-            i = i + 1
+        if (self.cabecote_fita == 0) and (deslocamento == -1):
+            self.fita.insert(0,"_")
+            self.cabecote_fita = 0
+            return
+
+        self.cabecote_fita = self.cabecote_fita + deslocamento
+
+    def __atualiza_estado_atual__(self, novo_estado):
+        #
+        self.estado_atual = novo_estado
+
+    def __atualiza_bloco_atual__(self, nome_novo_bloco):
+        #
+        self.nome_bloco_atual = nome_novo_bloco

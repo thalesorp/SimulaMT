@@ -53,7 +53,7 @@ fim ; clonaCar
 ; TERMINA com cabecote no caractere que foi copiado
 bloco fazCopia 1
    1 [a] -- 1 i 10
-   1 [e] -- 2 i 10
+   1 [e] -- 2 i 10 
    1 [i] -- 3 i 10
    1 [o] -- 4 i 10
    1 [u] -- 5 i 10
