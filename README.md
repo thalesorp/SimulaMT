@@ -13,7 +13,9 @@ Será necessário apenas a versão 2.7 do Python para a compilação do código 
 ### Arquivo .mt
 
 Um arquivo .mt é usado para definir um código fonte de algum algoritmo para a máquina de Turing. Existem dois algoritmos exemplos neste repositório: um reconhecedor de palíndromos e um algoritmo que troca vocais por números inteiros, sendo o segundo um exemplo da utilização da segunda fita.
+
 Veja ``reconhecedor-palindromo.mt`` e ``troca-vogais-por-inteiros-2a-fita.mt`` para mais informações.
+
 ### Argumentos
 
 Primeiramente será necessário informar o arquivo a ser simulado. Apois isso existem três opções de execução da máquina:
