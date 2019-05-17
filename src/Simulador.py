@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################################
+#                                                                                        #
+#  Simulador da Máquina de Turing (com duas fitas)                                       #
+#  Desenvolvido como trabalho prático para a disciplina de Teoria da Computação.         #
+#  Instituto Federal de Minas Gerais - Campus Formiga, 2019.                             #
+#  Autores:                                                                              #
+#  Thales Otávio, @ThalesORP, ThalesORP@gmail.com                                        #
+#  Pedro Costa, @PeduCosta, peducosta17@gmail.com, +55 (37) 99829-1751                   #
+#                                                                                        #
+##########################################################################################
+
 import sys
 
 class Simulador(object):

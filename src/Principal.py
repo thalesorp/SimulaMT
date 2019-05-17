@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##########################################################################################
+#                                                                                        #
+#  Simulador da Máquina de Turing (com duas fitas)                                       #
+#  Desenvolvido como trabalho prático para a disciplina de Teoria da Computação.         #
+#  Instituto Federal de Minas Gerais - Campus Formiga, 2019.                             #
+#  Autores:                                                                              #
+#  Thales Otávio, @ThalesORP, ThalesORP@gmail.com                                        #
+#  Pedro Costa, @PeduCosta17, peducosta17@gmail.com, +55 (37) 99829-1751                 #
+#                                                                                        #
+##########################################################################################
+
 import sys
 import argparse
 
@@ -21,22 +32,6 @@ def main():
     parser.add_argument("-s", "--steps", metavar='N', help="mostra o resultado passo a passo de N computações, depois reabre o prompt para aguardar nova opção (-r,-v,-s). Caso não seja fornecida nova opção (entrada em branco), o padrão é repetir a mesma opção fornecida anteriormente")
     parser.add_argument("-head", metavar='DELIMITADORES', help="modifica os dois caracteres delimitadores, esquerdo e direito, do cabeçote")
     args = vars(parser.parse_args())
-
-    arquivo = args['file_path']
-    print "arquivo:", arquivo
-
-    opcao = "?"
-    opcao = args['']
-
-    n_steps = args['steps']
-    print "n_steps:", n_steps
-
-    if not args['head']:
-        print "not args"
-        delimiter = args['head']
-
-    print "delimiter:", delimiter
-    raw_input()
     '''
 
     if len(sys.argv) < 3:

@@ -1,4 +1,4 @@
-   ; Detector de palindromos
+; Detector de palindromos
 
 
 bloco main 01
