@@ -22,9 +22,9 @@ def main():
     arquivo = None
     opcao = None
     n_steps = 500
-    delimiter = "()"
+    delimitadores = "()"
 
-    '''
+
     parser = argparse.ArgumentParser()
     parser.add_argument('file_path', metavar='file', type=str, help='arquivo do algoritmo a ser simulado')
     parser.add_argument("-r", "--resume", action='store_true', help="executa o programa até o fim em modo silencioso")
@@ -32,42 +32,27 @@ def main():
     parser.add_argument("-s", "--steps", metavar='N', help="mostra o resultado passo a passo de N computações, depois reabre o prompt para aguardar nova opção (-r,-v,-s). Caso não seja fornecida nova opção (entrada em branco), o padrão é repetir a mesma opção fornecida anteriormente")
     parser.add_argument("-head", metavar='DELIMITADORES', help="modifica os dois caracteres delimitadores, esquerdo e direito, do cabeçote")
     args = vars(parser.parse_args())
-    '''
 
-    if len(sys.argv) < 3:
-        print 'Parametros incorretos!'
-        quit()
-    elif (len(sys.argv) == 3) and (sys.argv[1] == "-r" or sys.argv[1] == "-v"):
-        opcao = sys.argv[1]
-        arquivo = sys.argv[2]
-    elif (len(sys.argv) == 4) and (sys.argv[1] == "-s"):
-        opcao = sys.argv[1]
-        arquivo = sys.argv[3]
-        if not sys.argv[2].isdigit():
-            print "Número de steps inválido!"
-            quit()
-        n_steps = sys.argv[2]
-    elif (len(sys.argv) >= 5) and (sys.argv[1] == "-head"):
-        opcao = sys.argv[3]
-        
-        if len(sys.argv[2]) != 2:
-            print "Erro nos delimitadores!"
-            quit()
-        delimiter = sys.argv[2]
-        if (opcao != "-r") and (opcao != "-v") and (opcao != "-s"):
-            print "Opção invalida!"
-            quit()
-        elif opcao == "-s":
-            if not sys.argv[4].isdigit():
-                print "Número de steps inválido!"
-                quit()
-            n_steps = sys.argv[4]
-            arquivo = sys.argv[5]
-        else:
-            arquivo = sys.argv[4]
+    arquivo = args['file_path']
 
+    if args['resume'] == True:
+        opcao = "-r"
 
-    simulaMT = Simulador(arquivo, opcao, n_steps, delimiter)
+    if args['verbose'] == True:
+        opcao = "-v"
+
+    if args['steps'] != None:
+        opcao = "-s"
+        n_steps = args['steps']
+
+    if opcao == None:
+        sys.stdout.write("Erro: Opção de computação não inserida.\n")
+        exit()
+
+    if args['head'] != None:
+        delimitadores = args['head']
+
+    simulaMT = Simulador(arquivo, opcao, n_steps, delimitadores)
 
     print ""
     print "Simulador de Máquina de Turing v4.0"
